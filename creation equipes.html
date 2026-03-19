@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Créateur d'Équipes</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0f0f13;--surface:#18181f;--surface2:#22222c;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);
+  --text:#f0eee8;--text2:#8c8a97;
+  --girl:#e87ea1;--girl-bg:rgba(232,126,161,0.12);--girl-bd:rgba(232,126,161,0.3);
+  --boy:#6ea8e8;--boy-bg:rgba(110,168,232,0.12);--boy-bd:rgba(110,168,232,0.3);
+  --accent:#c8a2f8;--accent-bg:rgba(200,162,248,0.12);
+  --green:#6eded4;
+  --t1:#f8c471;--t2:#82e0aa;--t3:#85c1e9;--t4:#f1948a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+header{padding:1.5rem 2rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;}
+header h1{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-.02em;}
+header h1 span{color:var(--accent);}
+.pills{display:flex;gap:.5rem;flex-wrap:wrap;}
+.pill{font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--text2);}
+.pill b{color:var(--text);}
+.export-bar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.btn-export{padding:5px 12px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;}
+.btn-export:hover{background:var(--surface2);color:var(--text);}
+.btn-import{padding:5px 12px;border-radius:8px;border:1px solid var(--green);background:transparent;color:var(--green);font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s;}
+.btn-import:hover{background:rgba(110,222,212,.1);}
+
+.tabs{display:flex;padding:0 2rem;border-bottom:1px solid var(--border);}
+.tab{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;padding:.85rem 1.25rem;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;letter-spacing:.04em;transition:color .2s;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+.content{padding:1.5rem 2rem;max-width:1100px;margin:0 auto;}
+.page{display:none;}.page.active{display:block;}
+
+/* LIST BAR */
+.list-bar{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.85rem 1rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;}
+.list-bar-label{font-size:12px;color:var(--text2);white-space:nowrap;}
+.list-tabs{display:flex;gap:6px;flex-wrap:wrap;flex:1;}
+.ltab{font-size:12px;font-weight:500;padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s,color .15s,border-color .15s;}
+.ltab.active{background:var(--accent-bg);color:var(--accent);border-color:var(--accent);}
+.ltab-del{font-size:10px;font-weight:700;padding:3px 6px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:color .15s,border-color .15s;}
+.ltab-del:hover{color:var(--t4);border-color:var(--t4);}
+.list-new{display:flex;gap:6px;align-items:center;}
+.list-new input{width:130px;padding:5px 10px;font-size:12px;}
+
+/* ADD SECTION */
+.add-section{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-bottom:1.5rem;}
+.section-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);margin-bottom:.85rem;}
+.add-row{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch;}
+input[type="text"]{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:9px 14px;font-size:13px;color:var(--text);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;flex:1;min-width:140px;}
+input[type="text"]:focus{border-color:var(--accent);}
+input[type="text"]::placeholder{color:var(--text2);}
+.gender-toggle{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:9px;overflow:hidden;}
+.gbtn{padding:9px 14px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--text2);font-family:'DM Sans',sans-serif;transition:background .15s,color .15s;}
+.gbtn.girl.on{background:var(--girl-bg);color:var(--girl);}
+.gbtn.boy.on{background:var(--boy-bg);color:var(--boy);}
+.btn{padding:9px 16px;border-radius:9px;border:none;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s,transform .1s;white-space:nowrap;}
+.btn:hover{opacity:.85;}.btn:active{transform:scale(.97);}
+.btn-accent{background:var(--accent);color:#1a0a2e;}
+.btn-outline{background:transparent;border:1px solid var(--border2);color:var(--text);}
+.btn-green{background:var(--green);color:#0a2e2b;}
+.btn-danger{background:rgba(241,148,138,.15);color:var(--t4);border:1px solid rgba(241,148,138,.25);}
+.btn-sm{padding:5px 11px;font-size:12px;border-radius:7px;}
+.mic-btn{width:40px;height:40px;border-radius:9px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s,border-color .2s;}
+.mic-btn.on{background:rgba(232,126,161,.15);border-color:var(--girl);animation:pulseM 1s infinite;}
+@keyframes pulseM{0%,100%{box-shadow:0 0 0 0 rgba(232,126,161,.4);}50%{box-shadow:0 0 0 5px rgba(232,126,161,0);}}
+.mic-hint{font-size:11px;color:var(--text2);margin-top:6px;font-style:italic;}
+.mic-hint.on{color:var(--girl);}
+
+/* PLAYERS */
+.players-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;flex-wrap:wrap;gap:.5rem;}
+.players-grid{display:flex;flex-wrap:wrap;gap:7px;min-height:50px;}
+.group-label{width:100%;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:6px 0 3px;}
+.chip{display:flex;align-items:center;gap:7px;padding:5px 9px 5px 5px;border-radius:25px;font-size:12px;font-weight:500;border:1px solid;animation:popIn .2s ease;}
+@keyframes popIn{from{transform:scale(.7);opacity:0;}to{transform:scale(1);opacity:1;}}
+.chip.girl{background:var(--girl-bg);border-color:var(--girl-bd);color:var(--girl);}
+.chip.boy{background:var(--boy-bg);border-color:var(--boy-bd);color:var(--boy);}
+.chip-av{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+.chip.girl .chip-av{background:var(--girl);color:#2a0a14;}
+.chip.boy .chip-av{background:var(--boy);color:#0a142a;}
+.chip-del{width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;cursor:pointer;opacity:.45;background:currentColor;transition:opacity .15s;}
+.chip-del:hover{opacity:1;}
+.chip-del-x{color:var(--bg);font-weight:900;}
+.empty{color:var(--text2);font-size:12px;font-style:italic;padding:.5rem 0;}
+
+/* GENERATE */
+.gen-section{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.25rem;margin-top:1.5rem;}
+.gen-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.nb-btns{display:flex;gap:5px;}
+.nb-btn{width:38px;height:38px;border-radius:9px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:15px;font-weight:700;cursor:pointer;transition:background .15s,color .15s,border-color .15s;font-family:'Syne',sans-serif;}
+.nb-btn.active{background:var(--accent-bg);color:var(--accent);border-color:var(--accent);}
+.teams-result{display:none;margin-top:1.25rem;}
+.teams-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.85rem;margin-bottom:1rem;}
+.tcard{background:var(--surface2);border:1px solid var(--border);border-radius:12px;overflow:hidden;animation:slideUp .3s ease;}
+@keyframes slideUp{from{transform:translateY(10px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.tcard-hd{padding:9px 14px;font-family:'Syne',sans-serif;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;}
+.tcard-badge{font-size:10px;padding:2px 7px;border-radius:20px;background:rgba(255,255,255,.07);color:rgba(255,255,255,.45);font-weight:500;font-family:'DM Sans',sans-serif;}
+.tcard-body{padding:8px 12px 12px;display:flex;flex-direction:column;gap:5px;}
+.trow{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;}
+.tdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.save-row{display:flex;gap:8px;flex-wrap:wrap;}
+.save-row input{flex:1;min-width:180px;}
+
+/* MANUAL */
+.m-nb-row{display:flex;gap:7px;align-items:center;margin-bottom:1rem;flex-wrap:wrap;}
+.m-pool-section{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.1rem;margin-bottom:1.25rem;}
+.m-pool-grid{display:flex;flex-wrap:wrap;gap:7px;min-height:44px;}
+.pitem{display:inline-flex;align-items:center;gap:7px;padding:7px 12px 7px 7px;border-radius:25px;font-size:13px;font-weight:500;border:1px solid;cursor:pointer;transition:transform .1s,opacity .15s,box-shadow .15s;}
+.pitem:hover{transform:scale(1.04);box-shadow:0 2px 12px rgba(0,0,0,.3);}
+.pitem:active{transform:scale(.96);}
+.pitem.girl{background:var(--girl-bg);border-color:var(--girl-bd);color:var(--girl);}
+.pitem.boy{background:var(--boy-bg);border-color:var(--boy-bd);color:var(--boy);}
+.pitem-av{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.pitem.girl .pitem-av{background:var(--girl);color:#2a0a14;}
+.pitem.boy .pitem-av{background:var(--boy);color:#0a142a;}
+.m-teams-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.85rem;}
+.mcard{background:var(--surface);border:2px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .2s;}
+.mcard.target-active{border-color:var(--accent);box-shadow:0 0 0 3px rgba(200,162,248,.15);}
+.mcard-hd{padding:10px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.mcard-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;}
+.mcard-body{padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px;min-height:56px;align-content:flex-start;}
+.mmember{display:inline-flex;align-items:center;gap:5px;padding:5px 8px 5px 5px;border-radius:18px;font-size:12px;font-weight:500;border:1px solid;cursor:pointer;transition:opacity .15s;}
+.mmember:hover{opacity:.75;}
+.mmember.girl{background:var(--girl-bg);border-color:var(--girl-bd);color:var(--girl);}
+.mmember.boy{background:var(--boy-bg);border-color:var(--boy-bd);color:var(--boy);}
+.mmember-av{width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;}
+.mmember.girl .mmember-av{background:var(--girl);color:#2a0a14;}
+.mmember.boy .mmember-av{background:var(--boy);color:#0a142a;}
+.mcard-empty{font-size:11px;color:var(--text2);font-style:italic;align-self:center;width:100%;text-align:center;padding:.5rem 0;}
+.m-save-row{display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap;}
+.m-save-row input{flex:1;min-width:180px;}
+/* Selecting state */
+.pitem.selecting{animation:selectPulse .4s ease;box-shadow:0 0 0 3px rgba(200,162,248,.4);}
+@keyframes selectPulse{0%{transform:scale(1);}50%{transform:scale(1.08);}100%{transform:scale(1);}}
+.mcard.pick-me{border-color:var(--accent);animation:pickPulse .6s ease infinite alternate;}
+@keyframes pickPulse{from{box-shadow:0 0 0 0 rgba(200,162,248,.2);}to{box-shadow:0 0 0 6px rgba(200,162,248,.0);}}
+
+/* ARCHIVES */
+.arch-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.5rem;}
+.arch-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:.85rem;overflow:hidden;}
+.arch-card-hd{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:.5rem;}
+.arch-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;}
+.arch-meta{font-size:11px;color:var(--text2);}
+.arch-teams{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;padding:14px 16px;}
+.arch-team h4{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;}
+.arch-member{font-size:12px;color:var(--text2);padding:2px 0;display:flex;align-items:center;gap:5px;}
+.arch-member span{color:var(--text);font-weight:500;}
+.no-arch{text-align:center;color:var(--text2);padding:3rem 2rem;font-size:13px;}
+.no-arch .ico{font-size:2.5rem;margin-bottom:.75rem;opacity:.3;}
+
+/* CONFIRM MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:9999;}
+.overlay.show{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:1.5rem;max-width:320px;width:90%;text-align:center;}
+.modal p{font-size:14px;line-height:1.5;margin-bottom:1.25rem;}
+.modal-btns{display:flex;gap:8px;justify-content:center;}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(12px);background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:10px 18px;font-size:12px;font-weight:500;opacity:0;transition:opacity .25s,transform .25s;z-index:9999;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.ok{border-color:var(--green);color:var(--green);}
+.toast.err{border-color:var(--t4);color:var(--t4);}
+
+@media(max-width:600px){.content{padding:1rem;}.tabs{padding:0 1rem;}.tab{padding:.7rem .9rem;font-size:11px;}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Équipes <span>✦</span></h1>
+  <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;">
+    <div class="pills">
+      <div class="pill">📋 Listes : <b id="s-lists">0</b></div>
+      <div class="pill">👧 Filles : <b id="s-girls">0</b></div>
+      <div class="pill">👦 Garçons : <b id="s-boys">0</b></div>
+      <div class="pill">📦 Archives : <b id="s-arch">0</b></div>
+    </div>
+    <div class="export-bar">
+      <button class="btn-export" id="btn-export">⬇ Exporter</button>
+      <label class="btn-import" style="cursor:pointer;">⬆ Importer <input type="file" id="import-file" accept=".json" style="display:none"></label>
+    </div>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" id="tab-create" onclick="goPage('create',this)">Créer équipes</button>
+  <button class="tab" id="tab-manual" onclick="goPage('manual',this)">Manuel</button>
+  <button class="tab" id="tab-arch" onclick="goPage('arch',this)">Sauvegardées</button>
+</div>
+
+<div class="content">
+
+<!-- PAGE CRÉER -->
+<div class="page active" id="page-create">
+
+  <div class="list-bar">
+    <span class="list-bar-label">📋 Liste :</span>
+    <div class="list-tabs" id="list-tabs"></div>
+    <div class="list-new">
+      <input type="text" id="new-list-name" placeholder="Nouvelle liste...">
+      <button class="btn btn-outline btn-sm" id="btn-add-list">+ Créer</button>
+    </div>
+  </div>
+
+  <div class="add-section">
+    <div class="section-title">Ajouter un joueur</div>
+    <div class="add-row">
+      <input type="text" id="player-name" placeholder="Prénom...">
+      <button class="mic-btn" id="mic-btn">🎤</button>
+      <div class="gender-toggle">
+        <button class="gbtn girl on" id="gbtn-girl">👧 Fille</button>
+        <button class="gbtn boy" id="gbtn-boy">👦 Garçon</button>
+      </div>
+      <button class="btn btn-accent" id="btn-add-player">+ Ajouter</button>
+    </div>
+    <div class="mic-hint" id="mic-hint">Cliquez 🎤 pour dicter un prénom</div>
+  </div>
+
+  <div>
+    <div class="players-header">
+      <div class="section-title" style="margin:0">Joueurs (<span id="player-count">0</span>)</div>
+      <button class="btn btn-outline btn-sm" id="btn-clear-players">Tout effacer</button>
+    </div>
+    <div class="players-grid" id="players-grid"></div>
+  </div>
+
+  <div class="gen-section">
+    <div class="section-title">Générer les équipes</div>
+    <div class="gen-row">
+      <span style="font-size:13px;color:var(--text2)">Nombre d'équipes :</span>
+      <div class="nb-btns" id="nb-btns">
+        <button class="nb-btn active" data-n="1">1</button>
+        <button class="nb-btn" data-n="2">2</button>
+        <button class="nb-btn" data-n="3">3</button>
+        <button class="nb-btn" data-n="4">4</button>
+      </div>
+      <button class="btn btn-green" id="btn-generate">⚡ Générer</button>
+    </div>
+    <div class="teams-result" id="teams-result">
+      <div class="teams-grid" id="teams-grid"></div>
+      <div class="save-row">
+        <input type="text" id="save-name" placeholder="Nom de la sauvegarde...">
+        <button class="btn btn-accent" id="btn-save-auto">💾 Sauvegarder</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE MANUELLE -->
+<div class="page" id="page-manual">
+
+  <div style="margin-bottom:1.25rem;">
+    <div style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;margin-bottom:4px;">Composition manuelle</div>
+    <div style="font-size:13px;color:var(--text2);line-height:1.6;">
+      <b style="color:var(--accent)">1.</b> Choisissez le nombre d'équipes &nbsp;
+      <b style="color:var(--accent)">2.</b> Cliquez sur un joueur → choisissez son équipe &nbsp;
+      <b style="color:var(--accent)">3.</b> Cliquez sur un membre pour le retirer
+    </div>
+  </div>
+
+  <div class="m-nb-row">
+    <span style="font-size:13px;color:var(--text2)">Nombre d'équipes :</span>
+    <div class="nb-btns" id="m-nb-btns">
+      <button class="nb-btn active" data-mn="1">1</button>
+      <button class="nb-btn" data-mn="2">2</button>
+      <button class="nb-btn" data-mn="3">3</button>
+      <button class="nb-btn" data-mn="4">4</button>
+    </div>
+    <button class="btn btn-outline btn-sm" id="btn-reset-manual">🔄 Réinitialiser</button>
+  </div>
+
+  <div class="m-pool-section">
+    <div class="section-title" style="margin-bottom:.75rem;">
+      👇 Joueurs disponibles — cliquez pour assigner (<span id="pool-count">0</span>)
+    </div>
+    <div class="m-pool-grid" id="pool-list"></div>
+  </div>
+
+  <div class="m-teams-grid" id="m-teams"></div>
+
+  <div id="m-pick-hint" style="display:none;background:var(--accent-bg);border:1px solid var(--accent);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--accent);margin:1rem 0;text-align:center;">
+    ✦ Choisissez l'équipe pour <b id="m-pick-name"></b> — ou cliquez à nouveau sur le joueur pour annuler
+  </div>
+
+  <div class="m-save-row">
+    <input type="text" id="m-save-name" placeholder="Nom de la sauvegarde...">
+    <button class="btn btn-accent" id="btn-save-manual">💾 Sauvegarder</button>
+  </div>
+</div>
+
+<!-- PAGE ARCHIVES -->
+<div class="page" id="page-arch">
+  <div class="arch-header">
+    <div style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;">Équipes sauvegardées</div>
+    <button class="btn btn-danger btn-sm" id="btn-clear-arch">🗑 Tout supprimer</button>
+  </div>
+  <div id="arch-list"></div>
+</div>
+
+</div><!-- end content -->
+
+<!-- CONFIRM MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <p id="modal-msg"></p>
+    <div class="modal-btns">
+      <button class="btn btn-outline" id="modal-cancel">Annuler</button>
+      <button class="btn btn-danger" id="modal-ok">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ----
+//  DATA
+// ----
+var lists   = JSON.parse(localStorage.getItem('eq_lists')   || 'null') || [{id:1,name:'Liste 1',players:[]}];
+var archives= JSON.parse(localStorage.getItem('eq_archives')|| '[]');
+var curListId = Number(localStorage.getItem('eq_cur') || lists[0].id);
+
+var gender  = 'girl';
+var nbAuto  = 1;
+var nbManual= 1;
+var manualTeams = [[]];
+var currentAutoTeams = null;
+
+var TNAMES  = ['Équipe 1','Équipe 2','Équipe 3','Équipe 4'];
+var TCOLORS = ['--t1','--t2','--t3','--t4'];
+
+function curList() {
+  return lists.find(function(l){ return Number(l.id)===Number(curListId); }) || lists[0];
+}
+function players() { return curList().players; }
+
+function saveLists()   { localStorage.setItem('eq_lists',   JSON.stringify(lists));   localStorage.setItem('eq_cur', curListId); }
+function saveArchives(){ localStorage.setItem('eq_archives',JSON.stringify(archives)); }
+
+// ----
+//  UTILITY
+// ----
+function shuffle(arr) {
+  var a=[].concat(arr);
+  for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}
+  return a;
+}
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1).toLowerCase(); }
+function sortedPlayers(arr){
+  var g=arr.filter(function(p){return p.gender==='girl';}).sort(function(a,b){return a.name.localeCompare(b.name,'fr');});
+  var b=arr.filter(function(p){return p.gender==='boy'; }).sort(function(a,b){return a.name.localeCompare(b.name,'fr');});
+  return {girls:g,boys:b};
+}
+
+// ----
+//  TOAST
+// ----
+function toast(msg, type) {
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+(type||'ok');
+  void t.offsetWidth; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); },2500);
+}
+
+// ----
+//  CONFIRM MODAL
+// ----
+var _confirmCb=null;
+function confirm2(msg,cb){
+  _confirmCb=cb;
+  document.getElementById('modal-msg').textContent=msg;
+  document.getElementById('overlay').classList.add('show');
+}
+document.getElementById('modal-cancel').onclick=function(){
+  document.getElementById('overlay').classList.remove('show');
+  _confirmCb=null;
+};
+document.getElementById('modal-ok').onclick=function(){
+  document.getElementById('overlay').classList.remove('show');
+  if(_confirmCb){ _confirmCb(); _confirmCb=null; }
+};
+
+// ----
+//  TABS
+// ----
+function goPage(id,el){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('page-'+id).classList.add('active');
+  if(el) el.classList.add('active');
+  if(id==='arch')   renderArchives();
+  if(id==='manual'){ resetManual(); renderManualPool(); renderManualTeams(); }
+}
+
+// ----
+//  LISTS
+// ----
+function renderListTabs(){
+  var container=document.getElementById('list-tabs');
+  container.innerHTML='';
+  lists.forEach(function(l){
+    var wrap=document.createElement('div');
+    wrap.style.cssText='display:inline-flex;align-items:center;gap:4px;';
+
+    var btn=document.createElement('button');
+    btn.className='ltab'+(Number(l.id)===Number(curListId)?' active':'');
+    btn.textContent=l.name+' ('+l.players.length+')';
+    (function(lid){ btn.onclick=function(){ switchList(lid); }; })(l.id);
+    wrap.appendChild(btn);
+
+    if(lists.length>1){
+      var del=document.createElement('button');
+      del.className='ltab-del';
+      del.textContent='✕';
+      del.title='Supprimer "'+l.name+'"';
+      (function(lid,lname,lcount){
+        del.onclick=function(e){
+          e.stopPropagation();
+          confirm2('Supprimer la liste "'+lname+'" et ses '+lcount+' joueur(s) ?', function(){
+            lists=lists.filter(function(x){ return Number(x.id)!==Number(lid); });
+            if(Number(curListId)===Number(lid)) curListId=lists[0].id;
+            saveLists();
+            renderListTabs();
+            renderPlayers();
+            updateStats();
+            resetManual();
+            toast('Liste supprimée','err');
+          });
+        };
+      })(l.id, l.name, l.players.length);
+      wrap.appendChild(del);
+    }
+    container.appendChild(wrap);
+  });
+}
+
+function switchList(id){
+  curListId=Number(id);
+  saveLists();
+  renderListTabs();
+  renderPlayers();
+  updateStats();
+  resetManual();
+  document.getElementById('teams-result').style.display='none';
+}
+
+document.getElementById('btn-add-list').onclick=function(){
+  var inp=document.getElementById('new-list-name');
+  var name=inp.value.trim()||('Liste '+(lists.length+1));
+  var id=Date.now();
+  lists.push({id:id,name:name,players:[]});
+  curListId=id;
+  saveLists();
+  renderListTabs();
+  renderPlayers();
+  updateStats();
+  resetManual();
+  inp.value='';
+  toast('Liste "'+name+'" créée !','ok');
+};
+
+// ----
+//  PLAYERS
+// ----
+function updateStats(){
+  var pl=players();
+  document.getElementById('s-lists').textContent=lists.length;
+  document.getElementById('s-girls').textContent=pl.filter(function(p){return p.gender==='girl';}).length;
+  document.getElementById('s-boys').textContent= pl.filter(function(p){return p.gender==='boy'; }).length;
+  document.getElementById('s-arch').textContent= archives.length;
+}
+
+function renderPlayers(){
+  var grid=document.getElementById('players-grid');
+  var pl=players();
+  document.getElementById('player-count').textContent=pl.length;
+  if(!pl.length){ grid.innerHTML='<span class="empty">Aucun joueur. Ajoutez des noms ci-dessus.</span>'; return; }
+  var s=sortedPlayers(pl); var html='';
+  if(s.girls.length){
+    html+='<div class="group-label" style="color:var(--girl)">👧 Filles ('+s.girls.length+')</div>';
+    html+=s.girls.map(function(p){ return chipHTML(p); }).join('');
+  }
+  if(s.boys.length){
+    html+='<div class="group-label" style="color:var(--boy)">👦 Garçons ('+s.boys.length+')</div>';
+    html+=s.boys.map(function(p){ return chipHTML(p); }).join('');
+  }
+  grid.innerHTML=html;
+  grid.querySelectorAll('.chip-del').forEach(function(el){
+    el.addEventListener('click',function(){ removePlayer(Number(this.dataset.id)); });
+  });
+}
+
+function chipHTML(p){
+  return '<div class="chip '+p.gender+'">'
+    +'<div class="chip-av">'+p.name[0].toUpperCase()+'</div>'
+    +p.name
+    +'<div class="chip-del" data-id="'+p.id+'"><span class="chip-del-x">✕</span></div>'
+    +'</div>';
+}
+
+document.getElementById('btn-add-player').onclick=addPlayer;
+document.getElementById('player-name').addEventListener('keydown',function(e){ if(e.key==='Enter') addPlayer(); });
+
+function addPlayer(){
+  var inp=document.getElementById('player-name');
+  var name=cap(inp.value.trim());
+  if(!name){ toast('Entrez un prénom !','err'); return; }
+  var pl=players();
+  if(pl.find(function(p){ return p.name.toLowerCase()===name.toLowerCase(); })){
+    toast('Ce joueur existe déjà !','err'); return;
+  }
+  pl.push({id:Date.now(),name:name,gender:gender});
+  saveLists(); renderPlayers(); updateStats();
+  inp.value=''; inp.focus();
+}
+
+function removePlayer(id){
+  curList().players=players().filter(function(p){ return p.id!==id; });
+  saveLists(); renderPlayers(); updateStats();
+}
+
+document.getElementById('btn-clear-players').onclick=function(){
+  if(!players().length) return;
+  confirm2('Effacer tous les joueurs de cette liste ?', function(){
+    curList().players=[];
+    saveLists(); renderPlayers(); updateStats();
+    document.getElementById('teams-result').style.display='none';
+    toast('Joueurs effacés','err');
+  });
+};
+
+// Gender
+document.getElementById('gbtn-girl').onclick=function(){ setGender('girl'); };
+document.getElementById('gbtn-boy').onclick=function(){  setGender('boy');  };
+function setGender(g){
+  gender=g;
+  document.getElementById('gbtn-girl').className='gbtn girl'+(g==='girl'?' on':'');
+  document.getElementById('gbtn-boy').className= 'gbtn boy' +(g==='boy' ?' on':'');
+}
+
+// ----
+//  MICROPHONE
+// ----
+var recog=null, listening=false;
+document.getElementById('mic-btn').onclick=toggleMic;
+function toggleMic(){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){ setMicHint('⛔ Non supporté. Utilisez Chrome ou Edge.',false); return; }
+  if(listening){ recog&&recog.stop(); return; }
+  recog=new SR(); recog.lang='fr-FR'; recog.continuous=false; recog.interimResults=true;
+  recog.onstart=function(){ listening=true; document.getElementById('mic-btn').classList.add('on'); document.getElementById('mic-btn').textContent='⏹'; setMicHint('🎤 En écoute…',true); };
+  recog.onresult=function(e){ var n=cap(e.results[0][0].transcript.trim()); document.getElementById('player-name').value=n; setMicHint(e.results[0].isFinal?'✓ "'+n+'" — choisissez le genre puis Ajouter':'🎤 "'+n+'"…',e.results[0].isFinal?false:true); };
+  recog.onerror=function(e){ setMicHint(e.error==='not-allowed'?'⛔ Micro non autorisé':'Rien entendu, réessayez.',false); stopMic(); };
+  recog.onend=function(){ stopMic(); };
+  recog.start();
+}
+function stopMic(){ listening=false; var b=document.getElementById('mic-btn'); b.classList.remove('on'); b.textContent='🎤'; }
+function setMicHint(m,on){ var h=document.getElementById('mic-hint'); h.textContent=m; h.className='mic-hint'+(on?' on':''); }
+
+// ----
+//  AUTO GENERATE
+// ----
+document.getElementById('nb-btns').querySelectorAll('.nb-btn').forEach(function(btn){
+  btn.onclick=function(){
+    nbAuto=Number(this.dataset.n);
+    document.getElementById('nb-btns').querySelectorAll('.nb-btn').forEach(function(b){ b.classList.remove('active'); });
+    this.classList.add('active');
+  };
+});
+
+document.getElementById('btn-generate').onclick=function(){
+  var pl=players();
+  if(pl.length<nbAuto){ toast('Il faut au moins '+nbAuto+' joueur(s) !','err'); return; }
+  var s=sortedPlayers(pl);
+  var girls=shuffle(s.girls), boys=shuffle(s.boys);
+  var teams=[];for(var i=0;i<nbAuto;i++) teams.push([]);
+  girls.forEach(function(g,i){ teams[i%nbAuto].push(g); });
+  boys.forEach(function(b,i){ teams[i%nbAuto].push(b); });
+  currentAutoTeams=teams;
+
+  var html='';
+  teams.forEach(function(team,idx){
+    var color='var('+TCOLORS[idx]+')';
+    var gc=team.filter(function(p){return p.gender==='girl';}).length;
+    var bc=team.filter(function(p){return p.gender==='boy'; }).length;
+    html+='<div class="tcard" style="animation-delay:'+(idx*.07)+'s">'
+      +'<div class="tcard-hd" style="background:'+color+'18;color:'+color+';border-bottom:1px solid '+color+'30">'
+      +TNAMES[idx]
+      +'<span class="tcard-badge">'+team.length+' j · 👧'+gc+' 👦'+bc+'</span>'
+      +'</div><div class="tcard-body">'
+      +team.map(function(p){
+        return '<div class="trow"><div class="tdot" style="background:'+(p.gender==='girl'?'var(--girl)':'var(--boy)')+'"></div>'+p.name+'<span style="font-size:10px;color:var(--text2);margin-left:auto">'+(p.gender==='girl'?'👧':'👦')+'</span></div>';
+      }).join('')
+      +'</div></div>';
+  });
+  document.getElementById('teams-grid').innerHTML=html;
+  document.getElementById('teams-result').style.display='block';
+  document.getElementById('save-name').value='';
+};
+
+document.getElementById('btn-save-auto').onclick=function(){
+  if(!currentAutoTeams){ toast('Générez d\'abord des équipes !','err'); return; }
+  var label=document.getElementById('save-name').value.trim()||'Équipes du '+new Date().toLocaleDateString('fr-FR');
+  archives.unshift({id:Date.now(),label:label,date:new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}),
+    teams:currentAutoTeams.map(function(t){ return t.map(function(p){ return {name:p.name,gender:p.gender}; }); })});
+  saveArchives(); updateStats(); toast('✓ Sauvegardé !','ok');
+  document.getElementById('save-name').value='';
+};
+
+// ----
+//  MANUAL TEAMS
+// ----
+document.getElementById('m-nb-btns').querySelectorAll('.nb-btn').forEach(function(btn){
+  btn.onclick=function(){
+    nbManual=Number(this.dataset.mn);
+    document.getElementById('m-nb-btns').querySelectorAll('.nb-btn').forEach(function(b){ b.classList.remove('active'); });
+    this.classList.add('active');
+    resetManual(); renderManualTeams(); renderManualPool();
+  };
+});
+
+document.getElementById('btn-reset-manual').onclick=function(){
+  resetManual(); renderManualTeams(); renderManualPool(); cancelPick();
+};
+
+function resetManual(){
+  manualTeams=[];
+  for(var i=0;i<nbManual;i++) manualTeams.push([]);
+}
+
+function getAssigned(){
+  var ids={};
+  manualTeams.forEach(function(t){ t.forEach(function(id){ ids[id]=true; }); });
+  return ids;
+}
+
+// ---- PICK MODE (click-to-assign) ----
+var pickingId = null;
+
+function cancelPick(){
+  pickingId=null;
+  document.getElementById('m-pick-hint').style.display='none';
+  document.querySelectorAll('.pitem.selecting').forEach(function(e){ e.classList.remove('selecting'); });
+  document.querySelectorAll('.mcard.pick-me').forEach(function(e){ e.classList.remove('pick-me'); });
+}
+
+function startPick(id, name){
+  if(pickingId===id){ cancelPick(); return; }
+  pickingId=id;
+  document.getElementById('m-pick-hint').style.display='block';
+  document.getElementById('m-pick-name').textContent=name;
+  document.querySelectorAll('.mcard').forEach(function(c){ c.classList.add('pick-me'); });
+}
+
+function assignToTeam(ti){
+  if(pickingId===null) return;
+  if(manualTeams[ti].indexOf(pickingId)===-1) manualTeams[ti].push(pickingId);
+  cancelPick();
+  renderManualTeams(); renderManualPool();
+}
+
+function renderManualPool(){
+  var assigned=getAssigned();
+  var avail=players().filter(function(p){ return !assigned[p.id]; });
+  var s=sortedPlayers(avail);
+  document.getElementById('pool-count').textContent=avail.length;
+  var list=document.getElementById('pool-list');
+  if(!avail.length){ list.innerHTML='<span class="empty" style="font-size:12px">✓ Tous les joueurs sont assignés !</span>'; return; }
+  list.innerHTML='';
+  function addGroup(arr,color){
+    arr.forEach(function(p){
+      var el=document.createElement('div');
+      el.className='pitem '+p.gender+(pickingId===p.id?' selecting':'');
+      el.innerHTML='<div class="pitem-av">'+p.name[0].toUpperCase()+'</div>'+p.name;
+      el.addEventListener('click',function(){ startPick(p.id, p.name); renderManualPool(); });
+      list.appendChild(el);
+    });
+  }
+  if(s.girls.length){
+    var gl=document.createElement('div');
+    gl.className='group-label'; gl.style.color='var(--girl)'; gl.style.width='100%';
+    gl.textContent='👧 Filles'; list.appendChild(gl);
+    addGroup(s.girls,'var(--girl)');
+  }
+  if(s.boys.length){
+    var bl=document.createElement('div');
+    bl.className='group-label'; bl.style.color='var(--boy)'; bl.style.width='100%';
+    bl.textContent='👦 Garçons'; list.appendChild(bl);
+    addGroup(s.boys,'var(--boy)');
+  }
+}
+
+function renderManualTeams(){
+  var wrap=document.getElementById('m-teams');
+  wrap.innerHTML='';
+  manualTeams.forEach(function(team,ti){
+    var color='var('+TCOLORS[ti]+')';
+    var members=team.map(function(id){ return players().find(function(p){ return p.id===id; }); }).filter(Boolean);
+    var card=document.createElement('div');
+    card.className='mcard'+(pickingId!==null?' pick-me':'');
+
+    var hd=document.createElement('div');
+    hd.className='mcard-hd';
+    hd.style.background=color+'18';
+    hd.innerHTML='<span class="mcard-title" style="color:'+color+'">'+TNAMES[ti]+'</span>'
+      +'<span style="font-size:11px;color:var(--text2)">'+members.length+' joueur'+(members.length!==1?'s':'')+'</span>';
+
+    // Clicking the card header assigns the picked player to this team
+    (function(idx){ hd.style.cursor='pointer'; hd.addEventListener('click', function(){ assignToTeam(idx); }); })(ti);
+    card.appendChild(hd);
+
+    var body=document.createElement('div');
+    body.className='mcard-body';
+    if(!members.length){
+      var hint=document.createElement('div');
+      hint.className='mcard-empty';
+      hint.textContent=pickingId!==null?'👆 Cliquez ici pour ajouter':'Vide';
+      body.appendChild(hint);
+    }
+    members.forEach(function(p){
+      if(!p) return;
+      var m=document.createElement('div');
+      m.className='mmember '+p.gender;
+      m.title='Cliquer pour retirer';
+      m.innerHTML='<div class="mmember-av">'+p.name[0].toUpperCase()+'</div>'+p.name+'<span style="font-size:9px;opacity:.5;margin-left:3px">✕</span>';
+      (function(pid,tidx){ m.addEventListener('click', function(){ removeFromTeam(pid,tidx); }); })(p.id,ti);
+      body.appendChild(m);
+    });
+
+    // Clicking body also assigns
+    (function(idx){ body.addEventListener('click', function(e){ if(e.target===body||e.target.classList.contains('mcard-empty')) assignToTeam(idx); }); })(ti);
+
+    card.appendChild(body);
+    wrap.appendChild(card);
+  });
+}
+
+function removeFromTeam(id,ti){
+  manualTeams[ti]=manualTeams[ti].filter(function(x){ return x!==id; });
+  renderManualTeams(); renderManualPool();
+}
+
+document.getElementById('btn-save-manual').onclick=function(){
+  var hasAny=manualTeams.some(function(t){ return t.length>0; });
+  if(!hasAny){ toast('Ajoutez des joueurs dans les équipes !','err'); return; }
+  var label=document.getElementById('m-save-name').value.trim()||'Équipes manuelles du '+new Date().toLocaleDateString('fr-FR');
+  archives.unshift({id:Date.now(),label:label,date:new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}),
+    teams:manualTeams.map(function(team){ return team.map(function(id){ var p=players().find(function(x){ return x.id===id; }); return p?{name:p.name,gender:p.gender}:null; }).filter(Boolean); })});
+  saveArchives(); updateStats(); toast('✓ Sauvegardé !','ok');
+  document.getElementById('m-save-name').value='';
+};
+
+// ----
+//  ARCHIVES
+// ----
+function renderArchives(){
+  var el=document.getElementById('arch-list');
+  updateStats();
+  if(!archives.length){ el.innerHTML='<div class="no-arch"><div class="ico">📦</div><p>Aucune équipe sauvegardée.</p></div>'; return; }
+  el.innerHTML='';
+  archives.forEach(function(a){
+    var card=document.createElement('div');
+    card.className='arch-card';
+    var hd=document.createElement('div');
+    hd.className='arch-card-hd';
+    hd.innerHTML='<div><div class="arch-title">'+a.label+'</div><div class="arch-meta">'+a.date+' · '+a.teams.length+' équipe(s) · '+a.teams.reduce(function(s,t){return s+t.length;},0)+' joueurs</div></div>';
+    var delBtn=document.createElement('button');
+    delBtn.className='btn btn-danger btn-sm';
+    delBtn.textContent='Supprimer';
+    (function(aid,alabel){
+      delBtn.onclick=function(){
+        confirm2('Supprimer "'+alabel+'" ?',function(){
+          archives=archives.filter(function(x){ return x.id!==aid; });
+          saveArchives(); renderArchives(); updateStats(); toast('Supprimé','err');
+        });
+      };
+    })(a.id,a.label);
+    hd.appendChild(delBtn);
+    card.appendChild(hd);
+    var tbody=document.createElement('div');
+    tbody.className='arch-teams';
+    a.teams.forEach(function(team,ti){
+      var col=document.createElement('div');
+      col.className='arch-team';
+      col.innerHTML='<h4 style="color:var('+TCOLORS[ti]+')">'+TNAMES[ti]+'</h4>'
+        +team.map(function(p){ return '<div class="arch-member"><span style="color:'+(p.gender==='girl'?'var(--girl)':'var(--boy)')+';font-size:10px">'+(p.gender==='girl'?'👧':'👦')+'</span><span>'+p.name+'</span></div>'; }).join('');
+      tbody.appendChild(col);
+    });
+    card.appendChild(tbody);
+    el.appendChild(card);
+  });
+}
+
+document.getElementById('btn-clear-arch').onclick=function(){
+  if(!archives.length) return;
+  confirm2('Supprimer TOUTES les équipes sauvegardées ?',function(){
+    archives=[]; saveArchives(); renderArchives(); updateStats(); toast('Archives supprimées','err');
+  });
+};
+
+
+// ----
+//  EXPORT / IMPORT
+// ----
+document.getElementById('btn-export').addEventListener('click', function(){
+  var data = {
+    version: 1,
+    exportDate: new Date().toLocaleDateString('fr-FR'),
+    lists: lists,
+    archives: archives
+  };
+  var blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'equipes-sauvegarde-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('✓ Données exportées !', 'ok');
+});
+
+document.getElementById('import-file').addEventListener('change', function(e){
+  var file = e.target.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    try {
+      var data = JSON.parse(ev.target.result);
+      if(!data.lists || !data.archives) throw new Error('Format invalide');
+      confirm2('Importer ' + data.lists.length + ' liste(s) et ' + data.archives.length + ' archive(s) ? Vos données actuelles seront remplacées.',
+        function(){
+          lists = data.lists;
+          archives = data.archives;
+          curListId = lists[0].id;
+          saveLists();
+          saveArchives();
+          renderListTabs();
+          renderPlayers();
+          renderArchives();
+          resetManual();
+          renderManualTeams();
+          renderManualPool();
+          updateStats();
+          document.getElementById('teams-result').style.display = 'none';
+          toast('✓ Données importées avec succès !', 'ok');
+        }
+      );
+    } catch(err) {
+      toast('⛔ Fichier invalide — utilisez un fichier exporté depuis cette application.', 'err');
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+});
+
+// ----
+//  INIT
+// ----
+(function migrate(){
+  var old=localStorage.getItem('eq_players');
+  if(old&&!localStorage.getItem('eq_lists')){ lists[0].players=JSON.parse(old); saveLists(); localStorage.removeItem('eq_players'); }
+})();
+
+renderListTabs();
+renderPlayers();
+renderArchives();
+resetManual();
+renderManualTeams();
+updateStats();
+</script>
+</body>
+</html>
